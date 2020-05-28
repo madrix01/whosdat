@@ -19,4 +19,14 @@ urlpatterns = [
     #    views.video_feed, 
     #    name='video_feed'
     #)
+    path(
+        'train/',
+        views.train,
+        name='train'
+    ),
+    path(
+        'detect/',
+        views.detect,
+        name='detect'
+    )
 ]
