@@ -21,6 +21,7 @@ class User(AbstractBaseUser):
     admin = models.BooleanField(default=False)
     staff = models.BooleanField(default=False)
     active = models.BooleanField(default=True)
+    timepost = models.DateTimeField(auto_now_add=True)
 
     objects = UserManager()
 
