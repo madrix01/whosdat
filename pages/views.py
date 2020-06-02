@@ -39,7 +39,8 @@ def create_dataset(request):
             x.save()
             detector = cv2.CascadeClassifier("opencv_haarcascade_data/haarcascade_frontalface_default.xml")
             print("[INFO] starting video stream...")
-            vs = VideoStream("rtsp://admin:admin1234@192.168.2.108:554/cam/realmonitor?channel=1&subtype=1").start()
+            #vs = VideoStream("rtsp://admin:admin1234@192.168.:554/cam/realmonitor?channel=1&subtype=1").start()
+            vs = VideoStream("rtsp://admin:Local@ssminfotech@192.168.16.69:554/cam/realmonitor?channel=1&subtype=1").start()
             time.sleep(5.0)
             total = 0
             directory = str(usr)
@@ -111,12 +112,12 @@ def detect(request):
     data = pickle.loads(open("encodings.pickle", "rb").read())
     detector = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
     print("[INFO] starting video stream...")
-    vs = VideoStream("rtsp://admin:admin1234@192.168.2.108:554/cam/realmonitor?channel=1&subtype=1").start()
+    vs = VideoStream("rtsp://admin:Local@ssminfotech@192.168.16.69:554/cam/realmonitor?channel=1&subtype=1").start()
     time.sleep(2.0)
     fps = FPS().start()
     while True:
         frame = vs.read()
-        frame = imutils.resize(frame, width=500)
+        frame = imutils.resize(frame, width=500, height=500)
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         rects = detector.detectMultiScale(gray, scaleFactor=1.1, 
@@ -138,9 +139,9 @@ def detect(request):
                 name = max(counts, key=counts.get)
             names.append(name)
 
-        for name in names:
-            usr = User.objects.get(admn_no=name)
-            x = Attendance(usr=usr)
+        """for name in names:
+                                    usr = User.objects.get(admn_no=name)
+                                    x = Attendance(usr=usr)"""
         for ((top, right, bottom, left), name) in zip(boxes, names):
             cv2.rectangle(frame, (left, top), (right, bottom),
                 (0, 255, 0), 2)
@@ -155,7 +156,7 @@ def detect(request):
         }
         asyncio.sleep(1)
         if key == ord("q"):
-            x.save()
+            #x.save()
             break
         fps.update()
     fps.stop()
