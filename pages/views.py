@@ -12,14 +12,19 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from django.http.response import StreamingHttpResponse
 
+from accounts.models import *
 from .models import *
 from .forms import *
+import config
 
 from imutils.video import VideoStream, FPS
 from imutils import paths
 
 
 User = get_user_model()
+
+def noCamera(request):
+    return render(request, '')
 
 def index(request):
     context = {}
@@ -40,7 +45,7 @@ def create_dataset(request):
             detector = cv2.CascadeClassifier("opencv_haarcascade_data/haarcascade_frontalface_default.xml")
             print("[INFO] starting video stream...")
             #vs = VideoStream("rtsp://admin:admin1234@192.168.:554/cam/realmonitor?channel=1&subtype=1").start()
-            vs = VideoStream("rtsp://admin:Local@ssminfotech@192.168.16.69:554/cam/realmonitor?channel=1&subtype=1").start()
+            vs = VideoStream(config.webcam).start()
             time.sleep(5.0)
             total = 0
             directory = str(usr)
@@ -112,9 +117,16 @@ def detect(request):
     data = pickle.loads(open("encodings.pickle", "rb").read())
     detector = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
     print("[INFO] starting video stream...")
-    vs = VideoStream("rtsp://admin:Local@ssminfotech@192.168.16.69:554/cam/realmonitor?channel=1&subtype=1").start()
+    try:
+        vs = VideoStream(config.webcam).start()
+        print("[INFO] Opened")
+    except:
+        print("[INFO] No Camera online")
+        redirect()
+    
     time.sleep(2.0)
     fps = FPS().start()
+    st_time = time.time()
     while True:
         frame = vs.read()
         frame = imutils.resize(frame, width=500, height=500)
@@ -139,9 +151,14 @@ def detect(request):
                 name = max(counts, key=counts.get)
             names.append(name)
 
-        """for name in names:
-                                    usr = User.objects.get(admn_no=name)
-                                    x = Attendance(usr=usr)"""
+        for name in names:
+            if name != 'Unknown':
+                usr = Employees.objects.get(name=name)
+                x = Attendance(employee=usr)
+        if time.time() - st_time >= 5 :
+            x.save()
+            st_time = time.time()
+
         for ((top, right, bottom, left), name) in zip(boxes, names):
             cv2.rectangle(frame, (left, top), (right, bottom),
                 (0, 255, 0), 2)

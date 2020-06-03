@@ -1,16 +1,13 @@
 from django import forms
 from django.contrib.auth import get_user_model
-
+from .models import *
 User = get_user_model()
 
 
 class RegForm(forms.ModelForm):
-    admn_no = forms.CharField(max_length=8)
-    email = forms.EmailField(widget=forms.EmailInput())
-    password = forms.CharField(widget=forms.PasswordInput())
     class Meta:
-        model = User
-        fields = ('email', 'admn_no')
+        model = Employees
+        fields = "__all__"
 
 
 class LoginForm(forms.Form):

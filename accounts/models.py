@@ -51,3 +51,12 @@ class User(AbstractBaseUser):
     @property
     def is_active(self, *args, **kwargs):
         return self.active
+
+
+class Employees(models.Model):
+    name = models.CharField(max_length=200)
+    employe_id = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.name
+        

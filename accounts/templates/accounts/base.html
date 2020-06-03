@@ -4,15 +4,16 @@
 <head>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <title>Login</title>
-    <link rel="stylesheet" href="{% static 'css/new.css' %}">
+    <link rel="stylesheet" href="{% static 'css/main1.css' %}">
 </head>
 <body class="body">
+    <div class="topnav">
+        {% block topnav %}
+        {% endblock %}
+    </div>
+    </div>
     <div class="head">
         Who's Dat
-    </div>
-    <div class="sidenav">
-        {% block sidenav%}
-        {% endblock %}
     </div>
     {% block content%}
     {% endblock %}

@@ -13,20 +13,14 @@ def register(request):
     if request.method == 'POST':
         form = RegForm(request.POST)
         if form.is_valid():
-            admn_no = form.cleaned_data['admn_no']
-            email = form.cleaned_data['email']
-            q_mail = User.objects.filter(Q(email__iexact=email))
-            q_admn = User.objects.filter(Q(admn_no__contains=admn_no))
-            if q_admn.exists():
-                raise forms.ValidationError('Admn_no already exsists')
-            if q_mail.exists():
-                raise forms.ValidationError('Email already exsists')
-            else:
-                password = form.cleaned_data['password']
-                x = User(admn_no=admn_no, email=email)
-                x.set_password(password)
-                x.save()
-                return redirect(reverse('accounts:login'))
+            name = form.cleaned_data['name']
+            employe_id = form.cleaned_data['employe_id']
+            q_id = Employees.objects.filter(Q(employe_id__contains=employe_id))
+            if q_id.exists():
+                raise forms.ValidationError('ID already exsists')
+            x = Employees(name=name, employe_id=employe_id)
+            x.save()
+            return redirect(reverse('pages:cd'))
     else:
         form = RegForm()
 
