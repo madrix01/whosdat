@@ -1,0 +1,70 @@
+{% extends "accounts/base.html" %}
+{% load static %}
+{% block head %}
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Test</title>
+	<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+	
+	<script>
+
+		$(document).ready(function(){
+
+			GetData();
+
+			setInterval(function(){
+				GetData();
+			}, 5000)
+
+		});
+
+		function GetData(){
+
+			$.ajax({
+		        type: "GET",
+		        url:"http://localhost:8000/api/api",
+		        dataType: "json",
+		        async: false,
+		        success: function (result) {
+		        	debugger;
+
+		        	var html = '';
+
+					for (var i = result.length - 1; i >= 0; i--) {
+
+			        	html += '<tr>';
+			        	html += '<td>' + result[i].name + '</td>';
+			        	html += '<td>' + result[i].time + '</td>';
+			        	html += '</tr>';
+					}
+
+		        	$("#tblScannedBody").html(html);
+		        },
+		        error: function (error) {
+		        	debugger;
+		        }
+		    });	
+		}
+
+	</script>
+	
+{% endblock %}
+{% block content %}
+	<div class="main">
+		<table id="attend">
+			<colgroup>
+       			<col span="1" style="width: 70%;">
+       			<col span="1" style="width: 30%;">
+    		</colgroup>
+			<thead>
+				<tr>
+					<th style="width:200px">Employee Name</th>
+					<th style="width:200px">Sacnned Time</th>
+				</tr>
+			</thead>
+			<tbody id="tblScannedBody">
+			</tbody>
+		</table>
+	</div>
+{% endblock %}
+</html>

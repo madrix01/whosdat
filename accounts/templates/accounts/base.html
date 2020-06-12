@@ -2,22 +2,30 @@
 <!DOCTYPE html>
 <html>
 <head>
+    {% block head %}
+    {% endblock %}
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <title>Login</title>
     <link rel="stylesheet" href="{% static 'css/main1.css' %}">
 </head>
 <body class="body">
     <div class="topnav">
-        {% block topnav %}
-        {% endblock %}
-    </div>
+        <a href="/">Home</a>
+        <a href="/accounts/login/">Login</a>
+        <a href="/accounts/register/">Register</a>
+        <a href="/create_dataset/">Create Dataset</a>
+        <a href="/detect/">Detect</a>
+        <a href="/train/">Train</a>
     </div>
     <div class="head">
         Who's Dat
     </div>
+    <div class="cr">
+        By Shlok Patel
+    </div>
     {% block content%}
     {% endblock %}
-    
+
 </form>
 </body>
 

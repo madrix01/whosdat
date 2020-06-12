@@ -1,3 +1,4 @@
+from datetime import datetime
 import time
 import cv2
 import imutils
@@ -11,6 +12,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from django.http.response import StreamingHttpResponse
+from django.contrib import messages
 
 from accounts.models import *
 from .models import *
@@ -19,7 +21,12 @@ import config
 
 from imutils.video import VideoStream, FPS
 from imutils import paths
+import pyodbc
 
+def get_sec(time_str):
+    time_str = str(time_str)
+    h, m, s = time_str.split(':')
+    return float(h)*3600 + float(m)*60 + float(s)
 
 User = get_user_model()
 
@@ -30,24 +37,19 @@ def index(request):
     context = {}
     return render(request, 'pages/index.html', context)
 
-@login_required
-def create_dataset(request):
+
+def cds(request):
     if request.method == "POST":
         form = DataForm(request.POST)
         if form.is_valid():
             start_time = time.time()
-            imageCtr = 0
-            print("[INFO] Is valid")
+            sampleNum = 0
+            
             usr = form.cleaned_data['usr']
             dataset = "Dataset/{usr}"
             x = UserData(usr=usr, dataset=dataset)
             x.save()
-            detector = cv2.CascadeClassifier("opencv_haarcascade_data/haarcascade_frontalface_default.xml")
-            print("[INFO] starting video stream...")
-            #vs = VideoStream("rtsp://admin:admin1234@192.168.:554/cam/realmonitor?channel=1&subtype=1").start()
-            vs = VideoStream(config.webcam).start()
-            time.sleep(5.0)
-            total = 0
+            
             directory = str(usr)
             parent = "Dataset/"
             path = os.path.join(parent, directory)
@@ -55,35 +57,42 @@ def create_dataset(request):
                 os.mkdir(path)
                 print("[INFO] Directory Created")
             except:
-                pass
-
-            while True:
-                frame = vs.read()   
-                orig = frame.copy()
-                frame = imutils.resize(frame, width=400)
-                rects = detector.detectMultiScale(
-                    cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY), scaleFactor=1.1,
-                    minNeighbors=5, minSize=(30, 30))
-                cv2.imshow("Frame", frame)
-                key = cv2.waitKey(1) & 0xFF
-                if time.time() - start_time >= 2:
-                    p = parent + directory + "/" + str(imageCtr) + ".png" 
-                    cv2.imwrite(p, orig)
-                    imageCtr += 1
-                    print("[INFO] ",p, "saved")
+                messages.info(request, "Dataset of selected user already exsists")
+                return redirect('/create_dataset/')
+            time.sleep(2.0)
+            try:
+                cam = cv2.VideoCapture(config.incamera)
+                print("[INFO] starting video stream...")
+            except:
+                messages.info(request, "Camera not found")
+                return redirect('/')
+            faceDetect = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+            time.sleep(2.0)
+            while(True):
+                ret, img = cam.read()
+                img = img[0:400 , 185:420]
+                gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+                faces = faceDetect.detectMultiScale(gray, 1.3, 5)
+                for(x,y,w,h) in faces:
+                    p = parent + directory + "/" + str(sampleNum) + ".png"
+                    print(p)
+                    cv2.imwrite(p, img)
+                    cv2.rectangle(img,(x,y),(x+w,y+h), (0,255,0), 2)
+                    cv2.waitKey(250)
                     start_time = time.time()
-                    if imageCtr == 31:
-                        break
-                if key == ord("q"):
+                    sampleNum = sampleNum+1
+                cv2.imshow("Face",img)
+                key = cv2.waitKey(1) & 0xFF
+                if key == ord("q") or sampleNum == 30:
                     break
-            print("[INFO] {} face images stored".format(imageCtr))
-            print("[INFO] cleaning up...")
+            cam.release()
             cv2.destroyAllWindows()
-            vs.stop()
     else:
         form = DataForm()
     context = {'form': form}
     return render(request, "pages/create_dataset.html", context)
+
+
 
 def train(request):
     print("[INFO] quantifying faces...")
@@ -109,27 +118,33 @@ def train(request):
     f = open("encodings.pickle", "wb")
     f.write(pickle.dumps(data))
     f.close()
-    return redirect("/")
-
+    messages.info(request, "Dataset Trained")
+    return redirect('/')
 
 def detect(request):
+    redirect('/')
     print("[INFO] loading encodings + face detector...")
     data = pickle.loads(open("encodings.pickle", "rb").read())
     detector = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
     print("[INFO] starting video stream...")
     try:
-        vs = VideoStream(config.webcam).start()
+        vs = VideoStream(config.incamera).start()
         print("[INFO] Opened")
+        redirect('/')
+    
     except:
         print("[INFO] No Camera online")
-        redirect()
+
+        redirect('/')
     
+
     time.sleep(2.0)
     fps = FPS().start()
     st_time = time.time()
     while True:
         frame = vs.read()
-        frame = imutils.resize(frame, width=500, height=500)
+        frame = imutils.resize(frame, width=500)
+        frame = frame[0:300 , 190:400]
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         rects = detector.detectMultiScale(gray, scaleFactor=1.1, 
@@ -153,11 +168,20 @@ def detect(request):
 
         for name in names:
             if name != 'Unknown':
+                print(name)
                 usr = Employees.objects.get(name=name)
-                x = Attendance(employee=usr)
-        if time.time() - st_time >= 5 :
-            x.save()
-            st_time = time.time()
+                try:
+                    at = Attendance.objects.filter(name=name).order_by('-id')[:1][::-1][0]
+                except:
+                    pass
+                #l_time = time.strptime(at.time, '%H:%M:%S')
+                #print(type(l_time), l_time)
+                t = Attendance(employee=usr, name=usr.name)
+                if time.time() - st_time >= 5 :
+                    now = datetime.now()
+                    now = now.strftime("%H:%M:%S")
+                    t.save()
+                    st_time = time.time()
 
         for ((top, right, bottom, left), name) in zip(boxes, names):
             cv2.rectangle(frame, (left, top), (right, bottom),
@@ -167,13 +191,11 @@ def detect(request):
                 0.75, (0, 255, 0), 2)
         cv2.imshow("Frame", frame)
         key = cv2.waitKey(1) & 0xFF
-        print(names)
+        
         context = {
             'names' : str(names)
         }
-        asyncio.sleep(1)
         if key == ord("q"):
-            #x.save()
             break
         fps.update()
     fps.stop()
@@ -182,4 +204,8 @@ def detect(request):
 
     cv2.destroyAllWindows()
     vs.stop()
-    return render(request, "pages/detect.html", context)
+    return render(request, "pages/checkview.html", context)
+
+
+def Attend(request):
+    return render(request, 'pages/checkview.html', {})

@@ -1,5 +1,14 @@
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
+import pyodbc
+
+#conn = pyodbc.connect('DRIVER={ODBC Driver 13 for SQL Server};SERVER=192.168.10.16;DATABASE=sugarcrm_configuration;UID=powerbi;PWD=poweruser@1234567')
+#cursor = conn.cursor()
+#print("Connected")
+#cursor.execute('SELECT name FROM sugarcrm_configuration.dbo.tbl_int_user where status = 1 order by name')
+
+
+#NAME_CHOICES = [tuple([x[0],x[0]]) for x in cursor]
 
 class UserManager(BaseUserManager):
     def create_user(self, admn_no, email, password=None):

@@ -6,7 +6,7 @@ from django.urls import reverse
 from django.contrib.auth import login, logout
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_exempt
-
+import pyodbc
 
 @csrf_exempt
 def register(request):
@@ -14,10 +14,16 @@ def register(request):
         form = RegForm(request.POST)
         if form.is_valid():
             name = form.cleaned_data['name']
-            employe_id = form.cleaned_data['employe_id']
-            q_id = Employees.objects.filter(Q(employe_id__contains=employe_id))
-            if q_id.exists():
-                raise forms.ValidationError('ID already exsists')
+            conn = pyodbc.connect('DRIVER={ODBC Driver 13 for SQL Server};SERVER=192.168.10.16;DATABASE=sugarcrm_configuration;UID=powerbi;PWD=poweruser@1234567')
+            curs = conn.cursor()
+            sql_command = "SELECT ID FROM sugarcrm_configuration.dbo.tbl_int_user where name=" + "'" + str(name) +"'" 
+            curs.execute(sql_command)
+            for x in curs:
+                employe_id = str(x[0])
+            q_name = Employees.objects.filter(Q(name__contains=name))
+            if q_name.exists():
+                messages.info(request, "User already exsists")
+                return redirect('/accounts/register/')
             x = Employees(name=name, employe_id=employe_id)
             x.save()
             return redirect(reverse('pages:cd'))

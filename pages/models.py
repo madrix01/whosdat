@@ -18,6 +18,14 @@ class Attendance(models.Model):
     employee = models.ForeignKey(Employees, on_delete=models.CASCADE)
     date = models.DateField(auto_now_add=True)
     time = models.TimeField(auto_now=True)
-
+    name = models.CharField(max_length=200)
     def __str__(self):
         return self.employee.name
+
+
+class SqlUser(models.Model):
+    user_id = models.CharField(max_length=100)
+    name = models.CharField(max_length=100)
+    def __str__(self):
+        return self.name
+        

@@ -4,14 +4,14 @@ from . import views
 app_name = 'pages'
 
 urlpatterns = [
-    path(
-        '',
-        views.index,
-        name='home',
-    ),
+    #path(
+    #    '',
+    #    views.index,
+    #    name='home',
+    #),
     path(
         'create_dataset/',
-        views.create_dataset,
+        views.cds,
         name='cd',
     ),
     #path(
@@ -28,5 +28,9 @@ urlpatterns = [
         'detect/',
         views.detect,
         name='detect'
+    ),
+    path(
+        '',
+        views.Attend
     )
 ]

@@ -1,12 +1,5 @@
 {% extends "accounts/base.html" %}
 {% load static %}
-{% block topnav %}
-    <a href="/accounts/login/">Login</a>
-    <a href="/accounts/register/">Register</a>
-    <a href="/create_dataset/">Create Dataset</a>
-    <a href="/detect/">Detect</a>
-    <a href="/train/">Train</a>
-{% endblock %}
 {% block content %}
 <div class="main">
     <form method="POST" class="form">
@@ -14,5 +7,16 @@
         {{form.as_p}}
         <button type="submit"; class="btn btn-outline-primary">Create</button>
     </form>
+	{% if messages %}
+	<ul class="messages">
+	    {% for message in messages %}
+	    <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>
+	    	<script type="text/javascript">
+	    		alert('{{message}}');
+	    	</script>
+		</li>
+	    {% endfor %}
+	</ul>
+	{% endif %}
 </div>
 {% endblock %}

@@ -56,6 +56,7 @@ input{
 .main {
     font-size: 28px; /* Increased text to enable scrolling */
     padding: 0px 10px;
+    color: white;
 }
 
 .sidenav a {
@@ -91,4 +92,28 @@ input{
 .topnav a.active {
     background-color: #BD00FF;
     color: white;
+}
+
+
+table{
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+    border: 1px solid white;
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 20;
+}
+th{
+    border: 1px solid white;
+    background-color: #BD00FF;
+}
+
+.cr{
+    text-align: center;
+    color: white;
+}
+
+tbody{
+    font-size: 50pt;
 }
