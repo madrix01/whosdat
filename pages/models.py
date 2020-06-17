@@ -29,3 +29,10 @@ class SqlUser(models.Model):
     def __str__(self):
         return self.name
         
+class AttendanceOut(models.Model):
+    employee = models.ForeignKey(Employees, on_delete=models.CASCADE)
+    date = models.DateField(auto_now_add=True)
+    time = models.TimeField(auto_now=True)
+    name = models.CharField(max_length=200)
+    def __str__(self):
+        return self.employee.name

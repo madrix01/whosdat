@@ -30,7 +30,16 @@ urlpatterns = [
         name='detect'
     ),
     path(
-        '',
+        'in/',
         views.Attend
+    ),
+    path(
+        'out/',
+        views.AttendOut
+    ),
+    path(
+        'detect/out/',
+        views.detectOut,
+        name='detectOut', 
     )
 ]
