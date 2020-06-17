@@ -22,7 +22,7 @@
 
 			$.ajax({
 		        type: "GET",
-		        url:"http://localhost:8000/api/api/in/",
+		        url:"http://localhost:8000/api/api/",
 		        dataType: "json",
 		        async: false,
 		        success: function (result) {
@@ -35,6 +35,7 @@
 			        	html += '<tr>';
 			        	html += '<td>' + result[i].name + '</td>';
 			        	html += '<td>' + result[i].time + '</td>';
+			        	html += '<td>' + result[i].inout + '</td>';
 			        	html += '</tr>';
 					}
 
@@ -53,13 +54,15 @@
 	<div class="main">
 		<table id="attend">
 			<colgroup>
-       			<col span="1" style="width: 70%;">
-       			<col span="1" style="width: 30%;">
+       			<col span="1" style="width: 50%;">
+       			<col span="1" style="width: 25%;">
+       			<col span="1" style="width: 25%;">
     		</colgroup>
 			<thead>
 				<tr>
 					<th style="width:200px">Employee Name</th>
 					<th style="width:200px">Sacnned Time</th>
+					<th style="width:200px">In/Out</th>
 				</tr>
 			</thead>
 			<tbody id="tblScannedBody">

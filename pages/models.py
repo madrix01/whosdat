@@ -19,6 +19,7 @@ class Attendance(models.Model):
     date = models.DateField(auto_now_add=True)
     time = models.TimeField(auto_now=True)
     name = models.CharField(max_length=200)
+    inout = models.CharField(max_length=3)
     def __str__(self):
         return self.employee.name
 

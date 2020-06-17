@@ -83,7 +83,7 @@ def cds(request):
                     sampleNum = sampleNum+1
                 cv2.imshow("Face",img)
                 key = cv2.waitKey(1) & 0xFF
-                if key == ord("q") or sampleNum == 30:
+                if key == ord("q") or sampleNum == config.dataset_quantity:
                     break
             cam.release()
             cv2.destroyAllWindows()
@@ -118,7 +118,6 @@ def train(request):
     f = open("encodings.pickle", "wb")
     f.write(pickle.dumps(data))
     f.close()
-    messages.info(request, "Dataset Trained")
     return redirect('/')
 
 def detect(request):
@@ -176,7 +175,7 @@ def detect(request):
                     pass
                 #l_time = time.strptime(at.time, '%H:%M:%S')
                 #print(type(l_time), l_time)
-                t = Attendance(employee=usr, name=usr.name)
+                t = Attendance(employee=usr, name=usr.name, inout='In')
                 if time.time() - st_time >= 5 :
                     now = datetime.now()
                     now = now.strftime("%H:%M:%S")
@@ -263,12 +262,10 @@ def detectOut(request):
                 print(name)
                 usr = Employees.objects.get(name=name)
                 try:
-                    at = AttendanceOut.objects.filter(name=name).order_by('-id')[:1][::-1][0]
+                    at = Attendance.objects.filter(name=name).order_by('-id')[:1][::-1][0]
                 except:
                     pass
-                #l_time = time.strptime(at.time, '%H:%M:%S')
-                #print(type(l_time), l_time)
-                t = AttendanceOut(employee=usr, name=usr.name)
+                t = Attendance(employee=usr, name=usr.name, inout='Out')
                 if time.time() - st_time >= 5 :
                     now = datetime.now()
                     now = now.strftime("%H:%M:%S")
