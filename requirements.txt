@@ -10,7 +10,7 @@ face-recognition-models==0.3.0
 imutils==0.5.3
 numpy==1.18.4
 opencv-python==4.2.0.34
-Pillow==8.1.1
+Pillow==8.3.2
 pyodbc==4.0.30
 pytz==2020.1
 sqlparse==0.3.1
